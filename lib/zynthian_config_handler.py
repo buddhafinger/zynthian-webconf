@@ -32,6 +32,8 @@ from subprocess import check_output
 
 sys.path.append(os.environ.get('ZYNTHIAN_UI_DIR'))
 import zynconf
+from lib.dashboard_helper import DashboardHelper
+
 
 #Avoid unwanted debug messages from zynconf module
 zynconf_logger = logging.getLogger('zynconf')
@@ -53,6 +55,7 @@ class ZynthianBasicHandler(tornado.web.RequestHandler):
 	restart_ui_flag = False
 	reload_midi_config_flag = False
 	reload_key_binding_flag = False
+	dashboard_helper = DashboardHelper()
 
 	def get_current_user(self):
 		return self.get_secure_cookie("user")
@@ -110,7 +113,8 @@ class ZynthianBasicHandler(tornado.web.RequestHandler):
 		if self.genjson:
 			self.write(config)
 		else:
-			self.render("config.html", body=body, config=config, title=title, errors=errors)
+			logging.warning("WALT SAYS: %s"%self.dashboard_helper.get_new_issue_url())
+			self.render("config.html", body=body, config=config, title=title, errors=errors, new_issue_url=self.dashboard_helper.get_new_issue_url())
 
 
 	def is_service_active(self, service):

@@ -31,6 +31,7 @@ from subprocess import check_output, DEVNULL
 from distutils import util
 from collections import OrderedDict
 from lib.zynthian_config_handler import ZynthianBasicHandler
+from lib.dashboard_helper import DashboardHelper
 
 sys.path.append(os.environ.get('ZYNTHIAN_UI_DIR'))
 import zynconf
@@ -39,7 +40,7 @@ import zynconf
 # Dashboard Handler
 #------------------------------------------------------------------------------
 
-class DashboardHandler(ZynthianBasicHandler):
+class DashboardHandler(ZynthianBasicHandler, DashboardHelper):
 
 	@tornado.web.authenticated
 	def get(self):
@@ -247,90 +248,6 @@ class DashboardHandler(ZynthianBasicHandler):
 			}
 
 		super().get("dashboard_block.html", "Dashboard", config, None)
-
-
-	def get_git_info(self, path):
-		branch = check_output("cd %s; git branch | grep '*'" % path, shell=True).decode()[2:-1]
-		gitid = check_output("cd %s; git rev-parse HEAD" % path, shell=True).decode()[:-1]
-		return { "branch": branch, "gitid": gitid }
-
-
-	def get_host_name(self):
-		with open("/etc/hostname") as f:
-			hostname=f.readline()
-			return hostname
-		return ""
-
-
-	def get_os_info(self):
-		return check_output("lsb_release -ds", shell=True).decode()
-
-
-	def get_build_info(self):
-		info = {}
-		try:
-			zynthian_dir = os.environ.get('ZYNTHIAN_DIR',"/zynthian")
-			with open(zynthian_dir + "/build_info.txt", 'r') as f:
-				rows = f.read().split("\n")
-				f.close()
-				for row in rows:
-					try:
-						k,v = row.split(": ")
-						info[k] = v
-						logging.debug("Build info => {}: {}".format(k,v))
-					except:
-						pass
-		except Exception as e:
-			logging.warning("Can't get build info! => {}".format(e))
-			info['Timestamp'] = '???'
-
-		return info
-
-
-	def get_ip(self):
-		#out=check_output("hostname -I | cut -f1 -d' '", shell=True).decode()
-		out=check_output("hostname -I", shell=True).decode()
-		return out
-
-
-	def get_gpio_expander(self):
-		try:
-			out=check_output("gpio i2cd", shell=True).decode().split("\n")
-			if len(out)>3 and out[3].startswith("20: 20"):
-				out2 = check_output("i2cget -y 1 0x20 0x10", shell=True).decode().strip()
-				if out2=='0x00':
-					return "MCP23008"
-				else:
-					return "MCP23017"
-		except:
-			pass
-		return "Not detected"
-
-
-	def get_ram_info(self):
-		out=check_output("free -m | grep 'Mem'", shell=True).decode()
-		parts=re.split('\s+', out)
-		return { 'total': parts[1]+"M", 'used': parts[2]+"M", 'free': parts[3]+"M", 'usage': "{}%".format(int(100*float(parts[2])/float(parts[1]))) }
-
-
-	def get_temperature(self):
-		try:
-			return check_output("/opt/vc/bin/vcgencmd measure_temp", shell=True).decode()[5:-3] + "ºC"
-		except:
-			return "???"
-
-
-	def get_volume_info(self, volume='/dev/root'):
-		try:
-			out=check_output("df -h | grep '{}'".format(volume), shell=True).decode()
-			parts=re.split('\s+', out)
-			return { 'total': parts[1], 'used': parts[2], 'free': parts[3], 'usage': parts[4] }
-		except:
-			return { 'total': 'NA', 'used': 'NA', 'free': 'NA', 'usage': 'NA' }
-
-
-	def get_sd_info(self):
-		return self.get_volume_info('/dev/root')
 
 
 	def get_media_info(self, mpath="/media/usb0"):
