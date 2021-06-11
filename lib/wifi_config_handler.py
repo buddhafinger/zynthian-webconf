@@ -84,6 +84,8 @@ class WifiConfigHandler(ZynthianBasicHandler):
 				newPassword = self.get_argument('ZYNTHIAN_WIFI_NEW_PASSWORD')
 				if newSSID and newPassword:
 					self.add_new_network(newSSID, newPassword)
+				else:
+					self.add_new_network(newSSID, None)
 
 			elif action[:7]=="REMOVE_":
 				delSSID = action[7:]
@@ -145,9 +147,13 @@ class WifiConfigHandler(ZynthianBasicHandler):
 		wpa_supplicant_data = self.read_wpa_supplicant_config()
 		wpa_supplicant_data += '\nnetwork={\n'
 		wpa_supplicant_data += '\tssid="{}"\n'.format(newSSID)
-		wpa_supplicant_data += '\tpsk="{}"\n'.format(newPassword)
+		if newPassword:
+			wpa_supplicant_data += '\tpsk="{}"\n'.format(newPassword)
 		wpa_supplicant_data += '\tscan_ssid=1\n'
-		wpa_supplicant_data += '\tkey_mgmt=WPA-PSK\n'
+		if newPassword:
+			wpa_supplicant_data += '\tkey_mgmt=NONE\n'
+		else
+			wpa_supplicant_data += '\tkey_mgmt=WPA-PSK\n'
 		wpa_supplicant_data += '\tpriority=10\n'
 		wpa_supplicant_data += '}\n'
 		self.save_wpa_supplicant_config(wpa_supplicant_data)
