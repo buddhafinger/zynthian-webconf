@@ -152,7 +152,7 @@ class WifiConfigHandler(ZynthianBasicHandler):
 		wpa_supplicant_data += '\tscan_ssid=1\n'
 		if newPassword:
 			wpa_supplicant_data += '\tkey_mgmt=NONE\n'
-		else
+		else:
 			wpa_supplicant_data += '\tkey_mgmt=WPA-PSK\n'
 		wpa_supplicant_data += '\tpriority=10\n'
 		wpa_supplicant_data += '}\n'
