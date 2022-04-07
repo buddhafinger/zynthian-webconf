@@ -94,7 +94,7 @@ class DisplayConfigHandler(ZynthianConfigHandler):
 			'DISPLAY_WIDTH': '480',
 			'DISPLAY_HEIGHT': '320',
 			'FRAMEBUFFER': '/dev/fb1'
-        }],
+		}],
 		['RPi-Display 2.8', {
 			'DISPLAY_CONFIG': 'dtoverlay=rpi-display,speed=32000000,rotate=270',
 			'DISPLAY_WIDTH': '320',
