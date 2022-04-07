@@ -89,7 +89,7 @@ class DisplayConfigHandler(ZynthianConfigHandler):
 			'DISPLAY_HEIGHT': '320',
 			'FRAMEBUFFER': '/dev/fb1'
 		}],
-		['Owootecc-3.5', {
+		['OwooteccTFT 3.5 Resistive', {
 			'DISPLAY_CONFIG': 'dtoverlay=tft35a:rotate=270',
 			'DISPLAY_WIDTH': '480',
 			'DISPLAY_HEIGHT': '320',
